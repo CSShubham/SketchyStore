@@ -21,6 +21,7 @@ import { loadUser } from "./slice/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { fetchCart } from "./slice/CartSlice";
+import { fetchWishlist } from "./slice/Wishlist";
 function App() {
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -32,8 +33,11 @@ function App() {
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(fetchCart());
+      dispatch(fetchWishlist());
     }
   }, [isAuthenticated, dispatch]);
+
+
   return (
     <>
       <Routes>

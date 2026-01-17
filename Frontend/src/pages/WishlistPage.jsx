@@ -48,8 +48,8 @@ function WishlistPage() {
       ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 overflow-auto px-6 gap-6">
-            {WishlistItems.map((product) => (
-              <ProductCard key={product.id} product={product} />
+            {WishlistItems.map((item) => (
+              <ProductCard key={item.product._id} product={item.product} />
             ))}
           </div>
         </>

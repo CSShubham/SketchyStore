@@ -58,7 +58,7 @@ const cartSlice = createSlice({
     builder
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.items = action.payload.items ;
-        console.log("cart items in slice:", state.items);
+        // console.log("cart items in slice:", state.items);
       })
       .addCase(addToCart.fulfilled, (state, action) => {
         state.items = action.payload.items ;
