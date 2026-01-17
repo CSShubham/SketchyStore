@@ -79,11 +79,11 @@ function ProductPage() {
                 e.stopPropagation();
                 dispatch(
                   addToCart({
-                    product: product._id,
-                    name: product.title,
-                    price: product.price,
+                    productId: product._id,
+                    // name: product.title,
+                    // price: product.price,
                     quantity: 1,
-                    image: product.images?.[0]?.url || "/placeholder.png",
+                    // image: product.images?.[0]?.url || "/placeholder.png",
                   })
                 );
 

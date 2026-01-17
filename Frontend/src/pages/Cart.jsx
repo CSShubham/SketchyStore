@@ -12,6 +12,7 @@ function Cart() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart.items);
+  console.log("cart items", cartItems);
   const cartQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   return (
     <div className="min-w-full min-h-screen">
@@ -52,37 +53,37 @@ function Cart() {
             <ul className="flex gap-5 flex-wrap">
               {cartItems.map((item) => (
                 <li
-                  key={item.product}
+                  key={item._id}
                   className="border p-2 px-3 rounded-xl shadow mb-4"
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/home/${item.product}`);
+                    navigate(`/home/${item.product._id}`);
                   }} 
                 >
                   <div className="flex justify-between px-1">
                     <p className="text-sm text-gray-500 capitalize">
-                      {item.category}
+                      {item.product.category}
                     </p>
                     <span>
                       <WishlistButton product={item} />
                     </span>
                   </div>
                   <img
-                    src={item.image}
-                    alt={item.title}
+                    src={item.product.images?.[0]?.url}
+                    alt={item.product.title}
                     className="w-full h-40 object-contain"
                   />
-                  <h3 className="text-lg font-semibold mt-2">{item.title}</h3>
-                  <p>Price: ${item.price}</p>
+                  <h3 className="text-lg font-semibold mt-2">{item.product.title}</h3>
+                  <p>Price: ${item.product.discountPrice}</p>
                   <p>Quantity: {item.quantity}</p>
-                  <p>Total: ${item.totalPrice.toFixed(2)}</p>
+                  <p>Total: ${(item.product.discountPrice * item.quantity).toFixed(2)}</p>
                   <div className="flex gap-3 items-center mt-2 mb-2 mx-1">
                     <button
                       className="border-1 rounded-lg text-sm px-2 py-2.5 bg-red-500 text-white active:bg-white active:text-red-500 cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
-                        dispatch(removeFromCart(item.id));
-                        toast.warn(`${item.title} removed from cart!!`);
+                        dispatch(removeFromCart(item.product._id));
+                        toast.warn(`${item.product.name} removed from cart!!`);
                       }}
                     >
                       Remove
@@ -90,7 +91,7 @@ function Cart() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/checkout/${item.id}`);
+                        navigate(`/checkout/${item.product}`);
                       }}
                       className="border-1 rounded-lg text-sm px-2 py-2.5 cursor-pointer"
                     >

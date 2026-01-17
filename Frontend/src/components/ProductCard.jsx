@@ -72,9 +72,9 @@ function ProductCard({ product }) {
             dispatch(
               addToCart({
                 productId: product._id,
-                title: product.title,
-                price: product.price,
-                image,
+                // title: product.title,
+                // price: product.price,
+                // image,
                 quantity: 1,
               }),
             );
