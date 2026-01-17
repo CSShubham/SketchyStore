@@ -1,8 +1,20 @@
 import { useState } from "react";
 
-export default function ImageCarousel({ images }) {
+export default function ImageCarousel({ images =[]}) {
   const [current, setCurrent] = useState(0);
   const length = images.length;
+
+  if (length === 0) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <img
+          src="./assets/Online Shopping.json"
+          alt="No product image"
+          className="w-full h-full object-cover"
+        />
+      </div>
+    );
+  }
 
   const prevSlide = () => setCurrent((current - 1 + length) % length);
   const nextSlide = () => setCurrent((current + 1) % length);
@@ -11,10 +23,10 @@ export default function ImageCarousel({ images }) {
     <div className="relative w-full max-w-md h-full mx-auto overflow-hidden">
       {/* Images */}
       <div className="w-full h-full">
-        {images.map((src, index) => (
+        {images.map((img, index) => (
           <img
             key={index}
-            src={src}
+            src={img.url}
             alt={`Slide ${index}`}
             className={`absolute w-full h-full object-cover transition-opacity duration-500 ${
               index === current ? "opacity-100" : "opacity-0"

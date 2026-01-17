@@ -15,23 +15,23 @@ function ProductPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-  const fetchProduct = async () => {
-    try {
-      const { data } = await API.get(`/products/${productId}`);
-      setProduct(data.product);
-    } catch (err) {
-      setProduct(undefined); // product not found
-    }
-  };
+    const fetchProduct = async () => {
+      try {
+        const { data } = await API.get(`/products/${productId}`);
+        setProduct(data.product);
+      } catch (err) {
+        setProduct(undefined); // product not found
+      }
+    };
 
-  // Try to find in Redux first
-  const found = items.find((p) => p._id === productId);
-  if (found) {
-    setProduct(found);
-  } else {
-    fetchProduct();
-  }
-}, [items, productId]);
+    // Try to find in Redux first
+    const found = items.find((p) => p._id === productId);
+    if (found) {
+      setProduct(found);
+    } else {
+      fetchProduct();
+    }
+  }, [items, productId]);
   // console.log("product is",product);
   if (product === undefined) {
     return <div className="text-4xl">Product Not Found!!!</div>;
@@ -69,27 +69,36 @@ function ProductPage() {
           {" "}
           {/*div container image and buttons*/}
           <div className="sm:min-w-120 h-90 sm:h-110 border-0">
-            <ImageCarousel images={product.images} />
+            <ImageCarousel images={product.images || []} />
           </div>
           <div className="flex px-5 py-1 sm:p-2 border-0 justify-between items-center mt-2 ">
             <button
               className="border-1 h-12 w-40 sm:h-15 sm:w-55 bg-[#FF735C] text-white text-sm font-semibold  active:bg-white active:text-[#FF735C] active:scale-95 transition rounded-lg px-2 py-2.5 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
-                dispatch(addToCart(product));
-                toast.success(`${product.title} added to cart!`,{
-                 theme:"colored"
+                dispatch(
+                  addToCart({
+                    product: product._id,
+                    name: product.name,
+                    price: product.price,
+                    quantity: 1,
+                    image: product.images?.[0]?.url || "/placeholder.png",
+                  })
+                );
+
+                toast.success(`${product.name} added to cart!`, {
+                  theme: "colored",
                 });
               }}
             >
               Add To Cart
             </button>
-            <button 
-            onClick={() =>{ 
-              navigate(`/checkout/${product._id}`);
-              
-            }}
-            className="border-1 h-12 w-40 sm:h-15 sm:w-55 rounded-lg font-semibold  text-sm px-2 py-2.3 cursor-pointer">
+            <button
+              onClick={() => {
+                navigate(`/checkout/${product._id}`);
+              }}
+              className="border-1 h-12 w-40 sm:h-15 sm:w-55 rounded-lg font-semibold  text-sm px-2 py-2.3 cursor-pointer"
+            >
               Buy Now <span className="text-xs">&#9889;</span>
             </button>
           </div>
@@ -98,11 +107,19 @@ function ProductPage() {
           {" "}
           {/*div container details*/}
           <div className="flex justify-between">
-            <h1 className="text-base sm:text-xl font-bold text-gray-400">{product.brand}</h1>
-            <h2 className="text-base sm:text-xl text-zinc-400">{product.category}</h2>
+            <h1 className="text-base sm:text-xl font-bold text-gray-400">
+              {product.brand}
+            </h1>
+            <h2 className="text-base sm:text-xl text-zinc-400">
+              {product.category}
+            </h2>
           </div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold">{product.title}</h1>
-          <p className="text-green-600 font-semibold text-base sm:text-lg">Special Price</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold">
+            {product.name}
+          </h1>
+          <p className="text-green-600 font-semibold text-base sm:text-lg">
+            Special Price
+          </p>
           <div className="flex  items-baseline gap-3">
             <p className="text-black font-bold text-2xl">${product.price}</p>
             <p className="line-through text-gray-500">${original.toFixed(0)}</p>
@@ -117,7 +134,9 @@ function ProductPage() {
             {product.description}
           </div>
           <div className="flex gap-3 items-baseline mt-3">
-            <span className="text-lg sm:text-xl w-5  opacity-85">&#128204;</span>
+            <span className="text-lg sm:text-xl w-5  opacity-85">
+              &#128204;
+            </span>
             <span className="text-lg sm:text-2xl font-semibold text-zinc-700">
               {product.shippingInformation}
             </span>
@@ -128,7 +147,8 @@ function ProductPage() {
               {product.returnPolicy}
             </div>
             <div>
-              <span className="text-xl sm:text-2xl mb-2">&#128184;</span> Cash on Delivery
+              <span className="text-xl sm:text-2xl mb-2">&#128184;</span> Cash
+              on Delivery
             </div>
             <div>
               <span className="text-lg sm:text-xl mb-2">&#128272;</span>
