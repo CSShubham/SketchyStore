@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect ,useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { fetchProductsByCategory } from "../slice/ProductAction";
 import ProductCard from "../components/ProductCard";
 function Product() {
@@ -13,14 +13,25 @@ function Product() {
   const { categoryItems, loading } = useSelector((state) => state.products);
 
   const options = [
-    { value: "", label: "--Select---" },
-    { value: "price", label: "Sort by Price (low to high)" },
-    { value: "title", label: "Sort by Title" },
-    { value: "discountPercentage", label: "Sort by Discount(low to high)" },
+    { value: "discountPrice", label: "Price: Low to High", order: "asc" },
+    { value: "discountPrice", label: "Price: High to Low", order: "desc" },
+    { value: "title", label: "Title: A → Z", order: "asc" },
+    { value: "title", label: "Title: Z → A", order: "desc" },
+    {
+      value: "discountPercentage",
+      label: "Discount: Low to High",
+      order: "asc",
+    },
+    {
+      value: "discountPercentage",
+      label: "Discount: High to Low",
+      order: "desc",
+    },
   ];
   const handleSelect = (option) => {
     setSelected(option.label);
     setsortBy(option.value);
+    setOrder(option.order);
     setIsOpen(false);
     // console.log("Sorting by:", option.value ,option.label);
     // You can call a sort function or set a parent state here
@@ -34,18 +45,33 @@ function Product() {
     dispatch(fetchProductsByCategory({ category }));
   }, [dispatch, category]);
 
-  const sortedProducts = useMemo(() => {
-    if (!sortBy) return categoryItems;
+ const sortedProducts = useMemo(() => {
+  if (!sortBy) return categoryItems;
 
-    const sorted = [...categoryItems].sort((a, b) => {
-      if (order === "asc") {
-        return a[sortBy] > b[sortBy] ? 1 : -1;
-      } else {
-        return a[sortBy] < b[sortBy] ? 1 : -1;
-      }
-    });
-    return sorted;
-  }, [categoryItems, sortBy, order]);
+  const sorted = [...categoryItems].sort((a, b) => {
+    let aValue = a[sortBy];
+    let bValue = b[sortBy];
+
+    // If discountPercentage, calculate dynamically
+    if (sortBy === "discountPercentage") {
+      aValue = ((a.price - a.discountPrice) / a.price) * 100;
+      bValue = ((b.price - b.discountPrice) / b.price) * 100;
+    }
+
+    if (typeof aValue === "string") {
+      // String comparison for title
+      return order === "asc"
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    } else {
+      // Number comparison for price/discount
+      return order === "asc" ? aValue - bValue : bValue - aValue;
+    }
+  });
+
+  return sorted;
+}, [categoryItems, sortBy, order]);
+
 
   return (
     <>

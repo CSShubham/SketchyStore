@@ -39,15 +39,16 @@ function ProductPage() {
   if (!product) {
     return <Loading />;
   }
-  let originalPrice = (discountedPrice, discountPercentage) => {
-    const df = 1 - discountPercentage / 100;
-    if (df <= 0) {
-      throw new Error("out of stock");
-    }
-    return discountedPrice / df;
-  };
+ const discountPercentage = (price, discountPrice) => {
+  if (price <= 0 || discountPrice < 0) {
+    return "Invalid price values";
+  }
 
-  const original = originalPrice(product.price, product.discountPercentage);
+  const discount = price - discountPrice;
+  return ((discount / price) * 100).toFixed(2);
+};
+
+  const percentage = discountPercentage(product.price, product.discountPrice);
 
   return (
     <div className="h-full w-full py-2 px-1 sm:py-1 sm:px-10">
@@ -121,10 +122,10 @@ function ProductPage() {
             Special Price
           </p>
           <div className="flex  items-baseline gap-3">
-            <p className="text-black font-bold text-2xl">${product.price}</p>
-            <p className="line-through text-gray-500">${original.toFixed(0)}</p>
+            <p className="text-black font-bold text-2xl">${product.discountPrice}</p>
+            <p className="line-through text-gray-500">${product.price}</p>
             <p className="text-green-600 font-semibold text-sm sm:text-base">
-              {product.discountPercentage}% off
+              {percentage}% off
             </p>
           </div>
           <span className=" text-center text-white font-semibold rounded-2xl py-0.5 sm:py-0.3 text-sm sm:text-base border-2 w-15 bg-green-600">

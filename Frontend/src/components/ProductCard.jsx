@@ -4,18 +4,30 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import WishlistButton from "./WishlistButton";
+import { PrinterCheckIcon } from "lucide-react";
 function ProductCard({ product }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Correct formula: original = discountedPrice / (1 - discountPercentage/100)
-  const discount = product.discountPercentage || 0;
-    const originalPrice = (price, discount) => {
-    const df = 1 - discount / 100;
-    return df > 0 ? price / df : price;
+  const discountPercentage = (price, discountPrice) => {
+    if (price <= 0 || discountPrice < 0) {
+      return "Invalid price values";
+    }
+
+    const discount = price - discountPrice;
+    return ((discount / price) * 100).toFixed(2);
   };
 
-  const original = originalPrice(product.price, discount);
+  const percentage = discountPercentage(product.price, product.discountPrice);
+  // Correct formula: original = discountedPrice / (1 - discountPercentage/100)
+  // const discount = product.discountPercentage || 0;
+  // const originalPrice = (price, discount) => {
+  //   const df = 1 - discount / 100;
+  //   return df > 0 ? price / df : price;
+  // };
+
+  // const original = originalPrice(product.price, discount);
+
   const image = product.images[0]?.url || "../assets/react.svg";
 
   // console.log(product)
@@ -43,13 +55,13 @@ function ProductCard({ product }) {
 
       <span className="flex gap-2 items-center flex-wrap">
         <p className="text-green-600 font-semibold text-xs sm:text-md">
-          &darr;{discount}%
+          &darr;{percentage}%
         </p>
         <p className="line-through text-xs sm:text-base">
-          ${original.toFixed(0)}
+          ${product.price.toFixed(0)}
         </p>
         <p className="text-black font-bold text-xs sm:text-sm md:text-lg">
-          ${product.price}
+          ${product.discountPrice}
         </p>
       </span>
       <div className="flex flex-col sm:flex-row justify-between items-center mt-2 mx-1 gap-1.5">
@@ -57,13 +69,15 @@ function ProductCard({ product }) {
           className="border-1 bg-[#FF735C] text-white text-[10px] lg:text-sm active:bg-white active:text-[#FF735C] active:scale-95 transition rounded-lg px-0.5 py-1 sm:px-2 sm:py-2.5 cursor-pointer w-full lg:w-auto"
           onClick={(e) => {
             e.stopPropagation();
-            dispatch(addToCart({
+            dispatch(
+              addToCart({
                 productId: product._id,
                 title: product.title,
                 price: product.price,
                 image,
                 quantity: 1,
-              }));
+              }),
+            );
             toast.success(`${product.title} added to cart!`);
           }}
         >
