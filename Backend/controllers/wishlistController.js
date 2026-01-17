@@ -46,7 +46,7 @@ export const addToWishlist = async (req, res) => {
   }
 
   await wishlist.save();
-
+  await wishlist.populate("items.product");
   res.status(200).json({
     success: true,
     message: "Product added to Wishlist",
@@ -65,11 +65,11 @@ export const removeFromWishlist = async (req, res) => {
   }
 
   wishlist.items = wishlist.items.filter(
-    (item) => item.product.toString() !== productId
+    (item) => item.product.toString() !== productId,
   );
 
   await wishlist.save();
-
+  await wishlist.populate("items.product");
   res.status(200).json({
     success: true,
     message: "Item removed from wishlist",
