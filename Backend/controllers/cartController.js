@@ -48,6 +48,7 @@ export const addToCart = async (req, res) => {
 
     await cart.save();
   }
+  await cart.populate("items.product");
 
   res.status(200).json({
     success: true,
@@ -73,7 +74,7 @@ export const updateCartItem = async (req, res) => {
 
   item.quantity = quantity;
   await cart.save();
-
+   await cart.populate("items.product");
   res.status(200).json({
     success: true,
     message: "Cart updated",
@@ -95,7 +96,7 @@ export const removeFromCart = async (req, res) => {
   );
 
   await cart.save();
-
+  await cart.populate("items.product");
   res.status(200).json({
     success: true,
     message: "Item removed from cart",
