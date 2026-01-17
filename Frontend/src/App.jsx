@@ -18,14 +18,22 @@ import OrdersPage from "./pages/OrdersPage";
 import OrderSuccess from "./pages/OrderSuccess";
 import PaymentMethod from "./pages/PaymentMethod";
 import { loadUser } from "./slice/AuthSlice";
-import { useDispatch  } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
+import { fetchCart } from "./slice/CartSlice";
 function App() {
   const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(loadUser());
   }, [dispatch]);
+  
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchCart());
+    }
+  }, [isAuthenticated, dispatch]);
   return (
     <>
       <Routes>

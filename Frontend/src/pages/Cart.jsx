@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { removeFromCart } from "../slice/CartSlice";
+import { removeFromCart ,updateCart} from "../slice/CartSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ShoppingCart } from "lucide-react";
@@ -52,12 +52,12 @@ function Cart() {
             <ul className="flex gap-5 flex-wrap">
               {cartItems.map((item) => (
                 <li
-                  key={item.id}
+                  key={item.product}
                   className="border p-2 px-3 rounded-xl shadow mb-4"
                   onClick={(e) => {
                     e.stopPropagation();
-                    navigate(`/home/${item.id}`);
-                  }}
+                    navigate(`/home/${item.product}`);
+                  }} 
                 >
                   <div className="flex justify-between px-1">
                     <p className="text-sm text-gray-500 capitalize">
@@ -68,7 +68,7 @@ function Cart() {
                     </span>
                   </div>
                   <img
-                    src={item.thumbnail}
+                    src={item.image}
                     alt={item.title}
                     className="w-full h-40 object-contain"
                   />
