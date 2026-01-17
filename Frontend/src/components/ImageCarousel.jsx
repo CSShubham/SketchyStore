@@ -8,7 +8,7 @@ export default function ImageCarousel({ images =[]}) {
     return (
       <div className="w-full h-full flex items-center justify-center">
         <img
-          src="./assets/Online Shopping.json"
+          src="./Mascot.jpeg"
           alt="No product image"
           className="w-full h-full object-cover"
         />

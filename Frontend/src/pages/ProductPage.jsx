@@ -79,14 +79,14 @@ function ProductPage() {
                 dispatch(
                   addToCart({
                     product: product._id,
-                    name: product.name,
+                    name: product.title,
                     price: product.price,
                     quantity: 1,
                     image: product.images?.[0]?.url || "/placeholder.png",
                   })
                 );
 
-                toast.success(`${product.name} added to cart!`, {
+                toast.success(`${product.title} added to cart!`, {
                   theme: "colored",
                 });
               }}
@@ -115,7 +115,7 @@ function ProductPage() {
             </h2>
           </div>
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold">
-            {product.name}
+            {product.title}
           </h1>
           <p className="text-green-600 font-semibold text-base sm:text-lg">
             Special Price
