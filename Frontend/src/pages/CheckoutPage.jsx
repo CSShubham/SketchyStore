@@ -13,7 +13,7 @@ function CheckoutPage() {
   const [product, setProduct] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const {userData}=useAuth();
+
 
   const [count, setCount] = useState(1);
 
