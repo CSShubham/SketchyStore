@@ -2,6 +2,17 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+const addressSchema = new mongoose.Schema({
+  label: { type: String, default: "Home" }, // Home, Work, etc.
+  line1: { type: String, required: true },
+  line2: String,
+  city: { type: String, required: true },
+  state: { type: String, required: true },
+  pincode: { type: String, required: true },
+  country: { type: String, default: "India" },
+  isDefault: { type: Boolean, default: false },
+});
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -13,6 +24,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please enter your email"],
       unique: true,
+      immutable: true,
       match: [
         /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
         "Please enter a valid email",
@@ -33,12 +45,21 @@ const userSchema = new mongoose.Schema(
       public_id: String,
       url: String,
     },
+    phones: [
+    {
+      number: { type: String },
+      isPrimary: { type: Boolean, default: false },
+    },
+  ],
+    // ✅ Address Field
+    addresses: [addressSchema],
+    
     createdAt: {
       type: Date,
       default: Date.now,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Encrypt password before saving
