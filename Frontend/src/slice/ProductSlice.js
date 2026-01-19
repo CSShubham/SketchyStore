@@ -3,6 +3,7 @@ import {
   fetchAllProducts,
   fetchProductsByCategory,
   fetchCategories,
+  fetchProductById,
 } from "./ProductAction";
 
 const productSlice = createSlice({
@@ -10,6 +11,7 @@ const productSlice = createSlice({
   initialState: {
     items: [],
     categoryItems: [],
+    product: null,
     categories: [],
     pagination: {
       currentPage: 1,
@@ -19,6 +21,7 @@ const productSlice = createSlice({
     loading: {
       products: false,
       categories: false,
+      product: false,
     },
     error: null,
   },
@@ -48,7 +51,20 @@ const productSlice = createSlice({
         state.loading.products = false;
         state.error = action.payload;
       })
-
+      // ========================
+      // FETCH SINGLE PRODUCT
+      // ========================
+      .addCase(fetchProductById.pending, (state) => {
+        state.loading.product = true;
+      })
+      .addCase(fetchProductById.fulfilled, (state, action) => {
+        state.loading.product = false;
+        state.product = action.payload;
+      })
+      .addCase(fetchProductById.rejected, (state, action) => {
+        state.loading.product = false;
+        state.error = action.payload;
+      })
       // ========================
       // FETCH BY CATEGORY
       // ========================
