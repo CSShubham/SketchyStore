@@ -1,11 +1,11 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { removeFromCart, updateCart } from "../slice/CartSlice";
+import WishlistButton from "../components/WishlistButton";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ShoppingCart } from "lucide-react";
 import { ChevronLeft } from "lucide-react";
-import WishlistButton from "../components/WishlistButton";
 import Lottie from "lottie-react";
 import emptyCartAnimation from "../assets/Empty Box.json";
 import { Heart, Trash2, Plus, Minus, ArrowRight,ShoppingBasket } from "lucide-react";
@@ -13,17 +13,10 @@ function Cart() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart.items);
-  console.log("cart items", cartItems);
   const cartQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <div className="min-w-full min-h-screen">
-      {/* <h2 className="flex items-center justify-center text-3xl md:text-5xl  font-semibold p-3">
-        <span className="flex items-center font-serif gap-1">
-          My Cart
-          <ShoppingCart className=" md:hidden pt-1" size={28} />{" "}
-        </span>
-      </h2> */}
       <div className="max-w-7xl mx-auto mb-6">
         <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6 flex items-center justify-center gap-3">
           <ShoppingCart className="text-[#FF735C]" size={40} />
@@ -60,24 +53,6 @@ function Cart() {
           </button>
         </div>
       </div>
-      {/* <div className="flex justify-between items-center px-5 py-4 ">
-        <button
-          className="px-0 py-1 md:px-0 pr-2 md:pr-3 md:py-2 border-1 rounded-xl flex items-center text-base md:text-lg text-white bg-[#FF735C] active:text-[#FF735C] active:bg-white"
-          onClick={() => {
-            navigate("/home");
-          }}
-        >
-          {" "}
-          <ChevronLeft
-            className="flex justify-center items-center"
-            size={30}
-          />{" "}
-          Continue Shopping{" "}
-        </button>
-        <div className=" text-lg md:text-xl font-semibold md:font-bold">
-          Total Cart Items : {cartQuantity}
-        </div>
-      </div> */}
       {cartItems.length === 0 ? (
         <div className="flex  flex-col justify-center items-center lg:h-150">
           <Lottie
@@ -93,7 +68,7 @@ function Cart() {
         <>
           <div className="container mx-auto p-4 px-10">
             <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Replace sampleItems with: cartItems.map((item) => ( */}
+             
               {cartItems.map((item) => (
                 <li
                   key={item._id}
@@ -110,19 +85,7 @@ function Cart() {
                         {item.product.category}
                       </span>
                     </div>
-                    <div
-                      className="absolute top-3 right-3 z-0"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {/* <WishlistButton product={item} /> */}
-                      {/* Or use this styled version: */}
-                      <button className="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md hover:bg-red-50 transition-colors">
-                        <Heart
-                          size={20}
-                          className="text-gray-600 hover:text-red-500 transition-colors"
-                        />
-                      </button>
-                    </div>
+                    <WishlistButton product={item.product} />
 
                     {/* Product Image */}
                     <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-6">
@@ -223,7 +186,7 @@ function Cart() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/checkout/${item.product._id}`);
+                          navigate(`/checkout/${item.product._id}?from=cart`);
                         }}
                         className="flex-1 bg-[#FF735C] text-white py-3 rounded-xl font-semibold hover:bg-[#ff6347] transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                       >
@@ -234,96 +197,6 @@ function Cart() {
                 </li>
               ))}
             </ul>
-            {/* <ul className="flex gap-5 flex-wrap">
-              {cartItems.map((item) => (
-                <li
-                  key={item._id}
-                  className="border p-2 px-3 rounded-xl shadow mb-4"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/home/${item.product._id}`);
-                  }}
-                >
-                  <div className="flex justify-between px-1">
-                    <p className="text-sm text-gray-500 capitalize">
-                      {item.product.category}
-                    </p>
-                    <span>
-                      <WishlistButton product={item} />
-                    </span>
-                  </div>
-                  <img
-                    src={item.product.images?.[0]?.url}
-                    alt={item.product.title}
-                    className="w-full h-40 object-contain"
-                  />
-                  <h3 className="text-lg font-semibold mt-2">
-                    {item.product.title}
-                  </h3>
-                  <p>Price: ${item.product.discountPrice}</p>
-                  <p>Quantity: {item.quantity}</p>
-                  {/* Quantity Controls */}
-            {/*<div className="flex items-center gap-2 border rounded-lg">
-                    <button
-                      className="px-3 py-1 text-lg font-bold hover:bg-gray-100"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        if (item.quantity > 1) {
-                          await dispatch(
-                            updateCart({
-                              productId: item.product._id,
-                              quantity: item.quantity - 1,
-                            }),
-                          );
-                        }
-                      }}
-                    >
-                      -
-                    </button>
-                    <span className="px-2">{item.quantity}</span>
-                    <button
-                      className="px-3 py-1 text-lg font-bold hover:bg-gray-100"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        await dispatch(
-                          updateCart({
-                            productId: item.product._id,
-                            quantity: item.quantity + 1,
-                          }),
-                        );
-                      }}
-                    >
-                      +
-                    </button>
-                  </div>
-                  <p>
-                    Total: $
-                    {(item.product.discountPrice * item.quantity).toFixed(2)}
-                  </p>
-                  <div className="flex gap-3 items-center mt-2 mb-2 mx-1">
-                    <button
-                      className="border-1 rounded-lg text-sm px-2 py-2.5 bg-red-500 text-white active:bg-white active:text-red-500 cursor-pointer"
-                      onClick={async (e) => {
-                        e.stopPropagation();
-                        await dispatch(removeFromCart(item.product._id));
-                        toast.warn(`${item.product.title} removed from cart!!`);
-                      }}
-                    >
-                      Remove
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/checkout/${item.product._id}`);
-                      }}
-                      className="border-1 rounded-lg text-sm px-2 py-2.5 cursor-pointer"
-                    >
-                      Place order <span className="text-xs">&#9889;</span>
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul> */}
           </div>
         </>
       )}
