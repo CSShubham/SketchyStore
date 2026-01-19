@@ -21,6 +21,22 @@ export const fetchAllProducts = createAsyncThunk(
     }
   }
 );
+// ==============================
+// FETCH SINGLE PRODUCT (BY ID)
+// ==============================
+export const fetchProductById = createAsyncThunk(
+  "products/fetchById",
+  async (id, thunkAPI) => {
+    try {
+      const { data } = await API.get(`/products/${id}`);
+      return data.product;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.message || "Failed to fetch product"
+      );
+    }
+  }
+);
 
 // ==============================
 // FETCH PRODUCTS BY CATEGORY
