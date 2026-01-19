@@ -1,271 +1,382 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Plus, Minus, ShieldCheck, MapPin, Phone, Edit2 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { Plus, Minus, ShieldCheck, ChevronLeft } from "lucide-react";
+import { loadProfile } from "../slice/ProfileSlice";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { fetchProductById } from "../slice/ProductAction";
+import { removeFromCart } from "../slice/CartSlice";
+import { toast } from "react-toastify";
 import Loading from "../components/Loading";
-
-import { placeOrder } from "../slice/OrderSlice";
 function CheckoutPage() {
-  const isMobile = window.matchMedia("(max-width: 767px)").matches;
-  const { productId } = useParams();
-  const { items } = useSelector((state) => state.products);
-  const [product, setProduct] = useState(null);
-  const dispatch = useDispatch();
+  
   const navigate = useNavigate();
-
-
-  const [count, setCount] = useState(1);
-
-  const increment = () => setCount(count + 1);
-  const decrement = () => {
-    if (count > 1) setCount(count - 1);
-  };
+  const dispatch = useDispatch();
+  const { product, loading } = useSelector((state) => state.products);
+  const productLoading = loading.product;
+  const { user, loading: profileLoading } = useSelector(
+    (state) => state.profile,
+  );
+  const { productId } = useParams();
+  const [searchParams] = useSearchParams();
+  const from = searchParams.get("from"); // "cart" | "product"
+  const cartItems = useSelector((state) => state.cart.items);
+  useEffect(() => {
+    dispatch(loadProfile());
+  }, [dispatch]);
 
   useEffect(() => {
-    const found = items.find((p) => p.id === Number(productId));
-    if (found) {
-      setProduct(found);
-    } else {
-      fetch(`https://dummyjson.com/products/${productId}`)
-        .then((res) => res.json())
-        .then(setProduct)
-        .catch(() => setProduct(undefined));
+    if (productId && from !== "cart") {
+      dispatch(fetchProductById(productId));
     }
-  }, [items, productId]);
-  // console.log("product is",product);
-  if (product === undefined) {
-    return <div className="text-4xl">Product Not Found!!!</div>;
-  }
-  if (!product) {
+  }, [dispatch, productId, from]);
+  const cartItem =
+    from === "cart"
+      ? cartItems.find((item) => item.product._id === productId)
+      : null;
+  const displayedProduct = cartItem ? cartItem.product : product;
+  const [count, setCount] = useState(cartItem ? cartItem.quantity : 1);
+  const increment = () => setCount((prev) => prev + 1);
+  const decrement = () => setCount((prev) => (prev > 1 ? prev - 1 : 1));
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [selectedPhone, setSelectedPhone] = useState(null);
+  const [showAddressSelector, setShowAddressSelector] = useState(false);
+  const [showPhoneSelector, setShowPhoneSelector] = useState(false);
+
+
+
+  useEffect(() => {
+    if (!user) return;
+
+    const defaultAddress =
+      user.addresses?.find((addr) => addr.isDefault) ||
+      user.addresses?.[0] ||
+      null;
+
+    const primaryPhone =
+      user.phones?.find((phone) => phone.isPrimary) || user.phones?.[0] || null;
+
+    setSelectedAddress(defaultAddress);
+    setSelectedPhone(primaryPhone);
+  }, [user]);
+
+  if (profileLoading || (from !== "cart" && loading.product)) {
     return <Loading />;
   }
-  let originalPrice = (discountedPrice, discountPercentage) => {
-    const df = 1 - discountPercentage / 100;
-    if (df <= 0) {
-      throw new Error("out of stock");
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="text-red-500">You must be logged in to checkout</span>
+      </div>
+    );
+  }
+
+  if (!displayedProduct) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="text-red-500">Product not found</span>
+      </div>
+    );
+  }
+  // Price calculations
+  const price = displayedProduct.discountPrice || displayedProduct.price;
+  const subtotal = (count * price).toFixed(2);
+  const shipping = 5.0;
+  const total = (parseFloat(subtotal) + shipping).toFixed(2);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!selectedAddress) {
+      toast.error("Please select a delivery address");
+      return;
     }
-    return discountedPrice / df;
+
+    if (!selectedPhone) {
+      toast.error("Please select a contact number");
+      return;
+    }
+    // If coming from cart, remove item from cart
+    if (from === "cart" && cartItem) {
+      await dispatch(removeFromCart(cartItem.product._id));
+    }
+
+    // Replace with actual order placement logic
+    navigate("/order-success");
   };
 
-  const original = originalPrice(product.price, product.discountPercentage);
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(placeOrder({ product, count }));
-    // {isMobile ? navigate("/account/myorder") : navigate("/account/myorders")};
-    navigate('/order-success')
-  };
+ 
 
   return (
     <div className="w-full mb-5 md:mb-0">
       <form onSubmit={handleSubmit}>
         <div className="min-h-screen bg-gray-100 p-4 md:p-10">
           <div className="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden md:flex md:space-x-8 p-6 md:p-10">
-            {/* Left Side - Shipping Info */}
-            <div className="w-full md:w-2/3">
-              <h1 className="text-2xl flex items-center font-semibold mb-4">
-                <div className="flex ">
-                  <button
-                    className=" active:rounded-xl active:text-white active:bg-[#FF735C] text-[#FF735C] bg-white"
-                    onClick={() => {
-                      navigate(-1);
-                    }}
-                  >
-                    {" "}
-                    <ChevronLeft
-                      className="flex justify-center items-center"
-                      size={30}
-                    />{" "}
-                  </button>
-                </div>
-                Shipping Information
-              </h1>
+            {/* Left Side - Shipping & Contact Info */}
+            <div className="w-full md:w-2/3 space-y-6">
+              <h1 className="text-2xl font-semibold mb-4">Checkout</h1>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium">Full name *</label>
-                  <input
-                    type="text"
-                    value={userData.username}
-                    required
-                    disabled
-                    className="w-full p-2 mt-1 border bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-300"
-                    placeholder="Enter full name"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium">Email address *</label>
-                  <input
-                    type="email"
-                    value={userData.email}
-                    required
-                    disabled
-                    className="w-full p-2 mt-1 border rounded bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-300"
-                    placeholder="Enter email address"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium">Phone number *</label>
-                  <input
-                    type="tel"
-                    value={userData.phoneNumber}
-                    required
-                    disabled
-                    className="w-full p-2 mt-1 border bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-300"
-                    placeholder="Enter phone number"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium">Country *</label>
-                  <select
-                    required
-                    disabled
-                    className=" w-full *:text-xs md:*text-lg p-2 mt-1 border bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-300 rounded"
-                  >
-                    <option>India</option>
-                    <option>USA</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col md:flex-row  md:space-x-4">
-                  <div className="flex-1">
-                    <label className="text-sm font-medium">City</label>
-                    <input
-                      type="text"
-                      value={userData.address.city}
-                      required
-                      disabled
-                      className="w-full p-2 mt-1 border rounded bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-300"
-                      placeholder="Enter city"
-                    />
+              {/* Personal Info */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h2 className="text-lg font-semibold mb-3">
+                  Personal Information
+                </h2>
+                <div className="space-y-2">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Full Name
+                    </label>
+                    <p className="text-base font-semibold">{user.name}</p>
                   </div>
-                  <div className="flex-1">
-                    <label className="text-sm font-medium">State</label>
-                    <input
-                      type="text"
-                      value={userData.address.state}
-                      required
-                      disabled
-                      className="w-full p-2 mt-1 border rounded bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-300"
-                      placeholder="Enter state"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="text-sm font-medium">ZIP Code</label>
-                    <input
-                      type="text"
-                      value={userData.address.postalCode}
-                      required
-                      disabled
-                      className="w-full p-2 mt-1 border rounded bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-300"
-                      placeholder="Enter ZIP code"
-                    />
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Email
+                    </label>
+                    <p className="text-base font-semibold">{user.email}</p>
                   </div>
                 </div>
+              </div>
 
-                <div className="flex items-center mt-4">
-                  <input type="checkbox" required className="mr-2 " />
-                  <span className="text-sm ">
-                    I have read and agree to the Terms and Conditions.
-                  </span>
+              {/* Contact Number Selection */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex justify-between items-center mb-3">
+                  <h2 className="text-lg font-semibold flex items-center gap-2">
+                    <Phone size={20} /> Contact Number
+                  </h2>
+                  {user.phones.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowPhoneSelector(!showPhoneSelector)}
+                      className="text-[#FF735C] hover:text-[#ff6347] flex items-center gap-1 text-sm"
+                    >
+                      <Edit2 size={16} /> Change
+                    </button>
+                  )}
                 </div>
+
+                {showPhoneSelector ? (
+                  <div className="space-y-2">
+                    {user.phones.map((phone) => (
+                      <div
+                        key={phone._id}
+                        onClick={() => {
+                          setSelectedPhone(phone);
+                          setShowPhoneSelector(false);
+                        }}
+                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${
+                          selectedPhone?._id === phone._id
+                            ? "border-[#FF735C] bg-orange-50"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                      >
+                        <p className="font-semibold">{phone.number}</p>
+                        {phone.isPrimary && (
+                          <span className="text-xs text-[#FF735C]">
+                            Primary
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-3 bg-white rounded-lg border border-gray-200">
+                    <p className="font-semibold">{selectedPhone?.number}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Delivery Address Selection */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex justify-between items-center mb-3">
+                  <h2 className="text-lg font-semibold flex items-center gap-2">
+                    <MapPin size={20} /> Delivery Address
+                  </h2>
+                  {user.addresses.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowAddressSelector(!showAddressSelector)
+                      }
+                      className="text-[#FF735C] hover:text-[#ff6347] flex items-center gap-1 text-sm"
+                    >
+                      <Edit2 size={16} /> Change
+                    </button>
+                  )}
+                </div>
+
+                {showAddressSelector ? (
+                  <div className="space-y-3">
+                    {user.addresses.map((address) => (
+                      <div
+                        key={address._id}
+                        onClick={() => {
+                          setSelectedAddress(address);
+                          setShowAddressSelector(false);
+                        }}
+                        className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                          selectedAddress?._id === address._id
+                            ? "border-[#FF735C] bg-orange-50"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-[#FF735C]">
+                            {address.label}
+                          </span>
+                          {address.isDefault && (
+                            <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
+                              Default
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-700">
+                          {address.line1}
+                          {address.line2 && `, ${address.line2}`}
+                        </p>
+                        <p className="text-sm text-gray-700">
+                          {address.city}, {address.state} - {address.pincode}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {address.country}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 bg-white rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-[#FF735C]">
+                        {selectedAddress?.label}
+                      </span>
+                      {selectedAddress?.isDefault && (
+                        <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
+                          Default
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-700">
+                      {selectedAddress?.line1}
+                      {selectedAddress?.line2 && `, ${selectedAddress.line2}`}
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      {selectedAddress?.city}, {selectedAddress?.state} -{" "}
+                      {selectedAddress?.pincode}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {selectedAddress?.country}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Terms & Conditions */}
+              <div className="flex items-center mt-4">
+                <input type="checkbox" required className="mr-2 w-4 h-4" />
+                <span className="text-sm">
+                  I have read and agree to the Terms and Conditions.
+                </span>
               </div>
             </div>
 
-            {/* Right Side - Cart Summary */}
+            {/* Right Side - Order Summary */}
             <div className="w-full md:w-1/2 mt-10 md:mt-0">
-              <h2 className="text-xl font-semibold mb-4">
-                Review your Product
-              </h2>
+              <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
 
-              {/* {images} */}
-              <div className="flex gap-2  md:gap-5">
-                <div className="">
-                  <img
-                    src={product.thumbnail}
-                    alt={product.title}
-                    className="w-25 md:w-30 h-30 sm:h-30 md:border-3 rounded-2xl border-gray-300 md:h-35 object-contain"
-                  />
-                </div>
-                <div className=" flex flex-col">
-                  <span className="text-sm md:text-xl">{product.title}</span>
-                  <div className="flex flex-col items-baseline">
-                    <div className="flex gap-2">
-                      <p className="line-through text-base text-gray-500">
-                        ${original.toFixed(0)}
-                      </p>
-                      <p className="text-green-600 font-semibold text-sm sm:text-base">
-                        {product.discountPercentage}% off
-                      </p>
-                    </div>
-                    <p className="text-black font-bold text-lg md:text-xl">
-                      ${product.price}
-                    </p>
+              {/* Product Details */}
+              <div className="flex gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                <img
+                  src={displayedProduct.images?.[0]?.url}
+                  alt={displayedProduct.title}
+                  className="w-24 h-24 md:w-32 md:h-32 object-contain rounded-lg border"
+                />
+                <div className="flex-1">
+                  <h3 className="text-sm md:text-base font-semibold mb-2">
+                    {displayedProduct.title}
+                  </h3>
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <span className="text-lg font-bold text-[#FF735C]">
+                      ${displayedProduct.discountPrice}
+                    </span>
+                    <span className="text-sm text-gray-400 line-through">
+                      ${displayedProduct.price}
+                    </span>
                   </div>
-                  <div className="flex  items-center text-lg mt-1 gap-2 md:gap-6">
-                    <div
-                      onClick={decrement}
-                      className="text-black active:scale-90 transition-transform  p-3 rounded-full shadow-md"
-                    >
-                      <Minus size={12} />
-                    </div>
-                    {count}
-                    <div
-                      onClick={increment}
-                      className=" text-black  active:scale-90 transition-transform  p-3 rounded-full shadow-md"
-                    >
-                      <Plus size={12} />
+
+                  {/* Quantity Controls */}
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium">Quantity:</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={decrement}
+                        className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center"
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span className="w-8 text-center font-semibold">
+                        {count}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={increment}
+                        className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center"
+                      >
+                        <Plus size={14} />
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-4">
-                <label className="text-sm font-medium">Discount code</label>
-                <div className="flex mt-1">
+              {/* Discount Code */}
+              <div className="mt-4 mb-4">
+                <label className="text-sm font-medium">Discount Code</label>
+                <div className="flex mt-2">
                   <input
                     type="text"
-                    className="flex-1 p-2 border rounded-l"
+                    className="flex-1 p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter code"
                   />
-                  <div className="px-4 flex justify-center items-center bg-gray-200 border hover:bg-gray-400 border-l-0 rounded-r">
+                  <button
+                    type="button"
+                    className="px-4 bg-gray-200 border border-l-0 rounded-r-lg hover:bg-gray-300 transition-colors"
+                  >
                     Apply
+                  </button>
+                </div>
+              </div>
+
+              {/* Price Breakdown */}
+              <div className="bg-gray-50 p-4 rounded-lg space-y-2 mb-4">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Subtotal</span>
+                  <span className="font-semibold">${subtotal}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Shipping</span>
+                  <span className="font-semibold">${shipping.toFixed(2)}</span>
+                </div>
+                <div className="border-t pt-2 mt-2">
+                  <div className="flex justify-between">
+                    <span className="font-semibold text-lg">Total</span>
+                    <span className="font-bold text-xl text-[#FF735C]">
+                      ${total}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <div className="text-sm text-gray-600 mt-4 space-y-1">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>${(count * product.price).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Shipping</span>
-                  <span>$5.00</span>
-                </div>
-                {/* <div className="flex justify-between">
-                  <span>Discount</span>
-                  <span>-$10.00</span>
-                </div> */}
-                <div className="flex justify-between font-semibold text-black mt-2">
-                  <span>Total</span>
-                  <span>${(count * product.price.toFixed(2) + 5).toFixed(2)}</span>
-                </div>
-              </div>
-
+              {/* Place Order Button */}
               <button
-
                 type="submit"
-                className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg"
               >
-                Pay Now
+                Place Order
               </button>
 
-              <div className="mt-3 flex items-center justify-center gap-1 text-xs text-gray-500 text-center">
-                <ShieldCheck />
+              {/* Security Badge */}
+              <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-500">
+                <ShieldCheck size={16} />
                 Secure Checkout
               </div>
             </div>
