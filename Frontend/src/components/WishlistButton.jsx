@@ -2,43 +2,42 @@
 import { useDispatch, useSelector } from "react-redux";
 import { addToWishlist, removeFromWishlist } from "../slice/Wishlist";
 import { Heart } from "lucide-react";
-import { useState } from "react";
 
 export default function WishlistButton({ product }) {
   const dispatch = useDispatch();
   const wishlistItems = useSelector((state) => state.wishlist.items);
+  const isWishlisted = wishlistItems.some(
+    (item) => item.product._id === product._id,
+  );
+  const toggleWishlist = (e) => {
+    e.stopPropagation();
 
-  const isInWishlist = wishlistItems.some((item) => item.id === product.id);
- const [animate, setAnimate] = useState(false);
-  //   const handleClick = (e) => {
-  //      e.stopPropagation();
-  //     if (isInWishlist) {
-  //       dispatch(removeFromWishlist(product.id));
-  //     } else {
-  //       dispatch(addToWishlist(product));
-  //     }
-  //   };
+    if (isWishlisted) {
+      dispatch(removeFromWishlist(product._id));
+      toast.info(`${product.title} removed from wishlist!`);
+    } else {
+      dispatch(addToWishlist(product._id));
+      toast.success(`${product.title} added to wishlist!`);
+    }
+  };
 
   return (
-    <button
-      className="w-6 h-6 flex items-center justify-center cursor-pointer"
-      onClick={(e) => {
-        e.stopPropagation();
-          setAnimate(true);
-    setTimeout(() => setAnimate(false), 300);
-        if (isInWishlist) {
-          dispatch(removeFromWishlist(product.id));
-        } else {
-          dispatch(addToWishlist(product));
-        }
-      }}
-    >
-      <Heart
-        size={18}
-        className={` rounded text-black  ${
-          isInWishlist ? "text-red-500 fill-current " : "text-gray-500"
-        }  ${animate ? "scale-125" : "scale-100"}  transition-all duration-300`}
-      />
-    </button>
+    <div className="absolute top-3 right-3 z-1">
+      {/* <WishlistButton product={product} /> */}
+      <button
+        className="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md hover:bg-red-50 transition-colors"
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleWishlist(e);
+        }}
+      >
+        <Heart
+          size={18}
+          className={`transition-colors ${
+            isWishlisted ? "text-red-500 fill-red-500" : "text-gray-600"
+          }`}
+        />
+      </button>
+    </div>
   );
 }
