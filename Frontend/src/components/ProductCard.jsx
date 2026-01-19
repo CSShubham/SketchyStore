@@ -4,7 +4,6 @@ import { addToWishlist, removeFromWishlist } from "../slice/Wishlist";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import WishlistButton from "./WishlistButton";
 import { PrinterCheckIcon, Tag, Heart, ShoppingCart, Zap } from "lucide-react";
 function ProductCard({ product }) {
   const navigate = useNavigate();
@@ -34,27 +33,9 @@ function ProductCard({ product }) {
   };
 
   const percentage = discountPercentage(product.price, product.discountPrice);
-  // Correct formula: original = discountedPrice / (1 - discountPercentage/100)
-  // const discount = product.discountPercentage || 0;
-  // const originalPrice = (price, discount) => {
-  //   const df = 1 - discount / 100;
-  //   return df > 0 ? price / df : price;
-  // };
-
-  // const original = originalPrice(product.price, discount);
+ 
 
   const image = product.images[0]?.url || "../assets/react.svg";
-
-  // console.log(product)
-  // return (
-  //    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-6">
-  //     <div className="max-w-7xl mx-auto">
-  //       <h2 className="text-3xl font-bold text-gray-800 mb-6">Featured Products</h2>
-
-  //       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-  //         {product.map((product) => {
-  //           const percentage = discountPercentage(product.price, product.discountPrice);
-  //           const image = product.images[0]?.url;
 
   return (
     <div
@@ -157,10 +138,7 @@ function ProductCard({ product }) {
             className="w-full bg-gradient-to-r from-orange-100 to-red-100 text-gray-800 text-xs sm:text-sm font-bold py-2.5 sm:py-3 md:py-3 rounded-xl hover:from-orange-200 hover:to-red-200 transition-all border-2 border-transparent hover:border-[#FF735C] flex items-center justify-center gap-2"
             onClick={(e) => {
               e.stopPropagation();
-              alert(
-                "Buy Now clicked! Replace this with your navigate function.",
-              );
-              navigate(`/checkout/${product._id}`);
+              navigate(`/checkout/${product._id}?from=productCard`);
             }}
           >
             <Zap size={16} className="text-[#FF735C]" />
@@ -169,73 +147,6 @@ function ProductCard({ product }) {
         </div>
       </div>
     </div>
-    //         );
-    //       })}
-    //     </div>
-    //   </div>
-    // </div>
-    // <div
-    //   //   key={product.id}
-    //   onClick={() => navigate(`/home/${product._id}`)}
-    //   className="border-1 p-2 sm:p-4  rounded-lg shadow  "
-    // >
-    //   <div className="flex justify-between items-center">
-    //     <p className="text-[10px] sm:text-sm text-gray-500 capitalize">
-    //       {product.category}
-    //     </p>
-    //     <WishlistButton product={product} />
-    //   </div>
-    //   <img
-    //     src={image}
-    //     alt={product.title}
-    //     className="w-full h-15 sm:h-30 md:h-35 object-contain"
-    //   />
-
-    //   <h3 className="text-[12px] sm:text-sm md:text-base font-semibold mt-2">
-    //     {product.title}
-    //   </h3>
-
-    //   <span className="flex gap-2 items-center flex-wrap">
-    //     <p className="text-green-600 font-semibold text-xs sm:text-md">
-    //       &darr;{percentage}%
-    //     </p>
-    //     <p className="line-through text-xs sm:text-base">
-    //       ${product.price.toFixed(0)}
-    //     </p>
-    //     <p className="text-black font-bold text-xs sm:text-sm md:text-lg">
-    //       ${product.discountPrice}
-    //     </p>
-    //   </span>
-    //   <div className="flex flex-col sm:flex-row justify-between items-center mt-2 mx-1 gap-1.5">
-    //     <button
-    //       className="border-1 bg-[#FF735C] text-white text-[10px] lg:text-sm active:bg-white active:text-[#FF735C] active:scale-95 transition rounded-lg px-0.5 py-1 sm:px-2 sm:py-2.5 cursor-pointer w-full lg:w-auto"
-    //       onClick={(e) => {
-    //         e.stopPropagation();
-    //         dispatch(
-    //           addToCart({
-    //             productId: product._id,
-    //             // title: product.title,
-    //             // price: product.price,
-    //             // image,
-    //             quantity: 1,
-    //           }),
-    //         );
-    //         toast.success(`${product.title} added to cart!`);
-    //       }}
-    //     >
-    //       Add To Cart
-    //     </button>
-    //     <button
-    //       onClick={(e) => {
-    //         e.stopPropagation();
-    //         navigate(`/checkout/${product._id}`);
-    //       }}
-    //       className="border-1 rounded-lg text-[10px] lg:text-sm px-0.5 py-1 sm:px-2 sm:py-2.5 cursor-pointer w-full lg:w-auto"
-    //     >
-    //       Buy Now <span className="text-[10px]">&#9889;</span>
-    //     </button>
-    //   </div>
-    // </div>
   );
 }
 
