@@ -5,14 +5,14 @@ import { loadProfile } from "../slice/ProfileSlice";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { fetchProductById } from "../slice/ProductAction";
 import { removeFromCart } from "../slice/CartSlice";
+import { createOrder } from "../slice/OrderSlice";
 import { toast } from "react-toastify";
 import Loading from "../components/Loading";
 function CheckoutPage() {
-  
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { product, loading } = useSelector((state) => state.products);
-  const productLoading = loading.product;
+  // const productLoading = loading.product;
   const { user, loading: profileLoading } = useSelector(
     (state) => state.profile,
   );
@@ -41,8 +41,6 @@ function CheckoutPage() {
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [showAddressSelector, setShowAddressSelector] = useState(false);
   const [showPhoneSelector, setShowPhoneSelector] = useState(false);
-
-
 
   useEffect(() => {
     if (!user) return;
@@ -96,16 +94,58 @@ function CheckoutPage() {
       toast.error("Please select a contact number");
       return;
     }
-    // If coming from cart, remove item from cart
-    if (from === "cart" && cartItem) {
-      await dispatch(removeFromCart(cartItem.product._id));
+    // Build order items
+    const orderItems = [
+      {
+        product: displayedProduct._id,
+        name: displayedProduct.title,
+        price: price,
+        quantity: count,
+        image: displayedProduct.images?.[0]?.url,
+      },
+    ];
+    // 3️⃣ Shipping info (matches Order schema)
+    const shippingInfo = {
+      addressLine1: selectedAddress.line1,
+      addressLine2: selectedAddress.line2,
+      city: selectedAddress.city,
+      state: selectedAddress.state,
+      country: selectedAddress.country,
+      pinCode: selectedAddress.pincode,
+      phone: selectedPhone.number,
+    };
+
+    // 4️⃣ Price calculation
+    const itemsPrice = count * price;
+    const shippingPrice = shipping;
+    const totalPrice = itemsPrice + shippingPrice;
+
+    // 5️⃣ Final payload
+    const orderData = {
+      orderItems,
+      shippingInfo,
+      paymentMethod: "COD",
+      itemsPrice,
+      shippingPrice,
+      totalPrice,
+    };
+    try {
+      // 6️⃣ Dispatch Redux thunk
+      const resultAction = await dispatch(createOrder(orderData));
+
+      // ❌ If API failed
+      if (createOrder.rejected.match(resultAction)) {
+        throw new Error(resultAction.payload);
+      }
+      // If coming from cart, remove item from cart
+      if (from === "cart" && cartItem) {
+        await dispatch(removeFromCart(cartItem.product._id));
+      }
+      navigate("/order-success");
+    } catch (error) {
+      toast.error(error.message);
     }
-
-    // Replace with actual order placement logic
-    navigate("/order-success");
   };
-
- 
 
   return (
     <div className="w-full mb-5 md:mb-0">
