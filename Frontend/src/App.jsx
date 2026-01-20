@@ -16,6 +16,7 @@ import Signup from "./pages/auth/Signup";
 import Privateroutes from "./routes/Privateroutes";
 import OrdersPage from "./pages/OrdersPage";
 import OrderSuccess from "./pages/OrderSuccess";
+import OrderDetailPage from "./pages/OrderDetailPage";
 import PaymentMethod from "./pages/PaymentMethod";
 import { loadUser } from "./slice/AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,14 +30,13 @@ function App() {
   useEffect(() => {
     dispatch(loadUser());
   }, [dispatch]);
-  
+
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(fetchCart());
       dispatch(fetchWishlist());
     }
   }, [isAuthenticated, dispatch]);
-
 
   return (
     <>
@@ -54,6 +54,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/order-success" element={<OrderSuccess />} />
+          {/* Order Routes - NEW */}
+
           <Route
             path="/home/category/:category"
             element={
@@ -97,6 +99,7 @@ function App() {
             <Route index element={<ProfileForm />} />
             <Route path="wishlist" element={<WishlistPage />} />
             <Route path="myorders" element={<OrdersPage />} />
+            <Route path="myorders/order/:id" element={<OrderDetailPage />} />
             <Route path="paymentmethod" element={<PaymentMethod />} />
           </Route>
           <Route
@@ -128,6 +131,14 @@ function App() {
             element={
               <Privateroutes>
                 <OrdersPage />
+              </Privateroutes>
+            }
+          />
+          <Route
+            path="/account/myorder/order/:id"
+            element={
+              <Privateroutes>
+                <OrderDetailPage />
               </Privateroutes>
             }
           />
