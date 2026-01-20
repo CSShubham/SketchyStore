@@ -113,7 +113,7 @@ const Login = () => {
           </span>
         </div>
 
-        <div className="text-center flex items-center justify-center">
+        {/* <div className="text-center flex items-center justify-center">
           <button
             // onClick={handleGoogleLogin}
             className="bg-red-500 hover:bg-red-600 text-white w-full py-2 rounded flex justify-center items-center gap-2"
@@ -125,7 +125,7 @@ const Login = () => {
             />
             Sign in with Google
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
