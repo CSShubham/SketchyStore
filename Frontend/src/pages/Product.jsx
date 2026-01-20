@@ -94,9 +94,9 @@ function Product() {
               {isOpen && (
                 <div className="absolute z-1 mt-2 w-full rounded-xl border-1 bg-white shadow-lg ring-1 ring-black ring-opacity-5">
                   <div className="py-1">
-                    {options.map((option) => (
+                    {options.map((option, index) => (
                       <button
-                        key={option.value}
+                        key={`${option.value}-${index}`}
                         onClick={() => handleSelect(option)}
                         className="w-full text-left block px-4 py-2 text-[12px] md:text-base text-gray-700 hover:bg-gray-100"
                       >
