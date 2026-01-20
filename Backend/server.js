@@ -25,7 +25,7 @@ app.use("/api/products", productRoutes);
 // After product routes
 app.use("/api/auth", authRoutes);
 app.use("/api/cart", cartRoutes);
-app.use("/api/orders", orderRoutes);
+app.use("/api/order", orderRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/profile", profileRoutes);
 // 404 Middleware
