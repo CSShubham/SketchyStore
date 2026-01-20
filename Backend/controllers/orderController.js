@@ -9,8 +9,8 @@ export const createOrder = async (req, res) => {
       orderItems,
       shippingInfo,
       paymentInfo,
+      paymentMethod = "COD",
       itemsPrice,
-      taxPrice,
       shippingPrice,
       totalPrice,
     } = req.body;
@@ -41,24 +41,29 @@ export const createOrder = async (req, res) => {
         });
       }
     }
-
+    // Generate Order ID
+    const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    //  Create order
     const order = await Order.create({
+      orderId,
       user: req.user._id,
       orderItems,
       shippingInfo,
+      paymentMethod,
       paymentInfo,
       itemsPrice,
-      taxPrice,
       shippingPrice,
       totalPrice,
-      paidAt: Date.now(),
+      paidAt: paymentMethod !== "COD" ? Date.now() : null,
     });
 
     // Reduce stock
     for (const item of orderItems) {
-      const product = await Product.findById(item.product);
-      product.stock -= item.quantity;
-      await product.save({ validateBeforeSave: false });
+      await Product.findByIdAndUpdate(
+        item.product,
+        { $inc: { stock: -item.quantity } },
+        { new: true },
+      );
     }
     // 5️⃣ Clear user cart (IMPORTANT)
     // await Cart.findOneAndDelete({ user: req.user._id });
@@ -78,7 +83,9 @@ export const createOrder = async (req, res) => {
 // GET LOGGED-IN USER ORDERS
 export const myOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user._id });
+    const orders = await Order.find({ user: req.user._id }).sort({
+      createdAt: -1,
+    });
 
     res.status(200).json({
       success: true,
@@ -97,13 +104,23 @@ export const getSingleOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate(
       "user",
-      "name email"
+      "name email",
     );
 
     if (!order) {
       return res.status(404).json({
         success: false,
         message: "Order not found",
+      });
+    }
+    // 🔐 SECURITY CHECK
+    const isOwner = order.user._id.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === "admin";
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to view this order",
       });
     }
 
