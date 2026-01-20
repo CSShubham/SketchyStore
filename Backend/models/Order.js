@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
   {
+    orderId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    
     user: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
@@ -23,23 +29,44 @@ const orderSchema = new mongoose.Schema(
     ],
 
     shippingInfo: {
-      address: String,
+      name: String, // optional (receiver name)
+      phone: String,
+      addressLine1: String,
+      addressLine2: String,
       city: String,
       state: String,
       country: String,
-      pinCode: Number,
-      phoneNo: String,
+      pinCode: String,
+    },
+
+    paymentMethod: {
+      type: String,
+      enum: ["COD", "CARD", "UPI"],
+      default: "COD",
     },
 
     paymentInfo: {
       id: String,
-      status: String,
+      status: {
+        type: String,
+        default: "PENDING",
+      },
     },
 
-    itemsPrice: Number,
-    taxPrice: Number,
-    shippingPrice: Number,
-    totalPrice: Number,
+    itemsPrice: {
+      type: Number,
+      required: true,
+    },
+
+    shippingPrice: {
+      type: Number,
+      required: true,
+    },
+
+    totalPrice: {
+      type: Number,
+      required: true,
+    },
 
     orderStatus: {
       type: String,
@@ -50,7 +77,7 @@ const orderSchema = new mongoose.Schema(
     paidAt: Date,
     deliveredAt: Date,
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("Order", orderSchema);
