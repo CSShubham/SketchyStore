@@ -3,6 +3,7 @@ import { UserPlus, UserRoundPen, Mail, EyeOff, Lock, Eye } from "lucide-react";
 import { useEffect, useState } from "react";
 import { registerUser } from "../../slice/AuthSlice";
 import Loading from "../../components/Loading";
+import { useDispatch, useSelector } from "react-redux";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-   const { loading, error } = useSelector((state) => state.auth);
+  const { loading, error } = useSelector((state) => state.auth);
   // useEffect(() => {
   //   if (!loading && userData) {
 
@@ -24,12 +25,13 @@ const Signup = () => {
     e.preventDefault();
     setErrorMessage("");
     try {
-      dispatch(registerUser({ name, email, password }))
-      .unwrap()
-      .then(() => navigate("/"));
-      window.location.reload();
+      await dispatch(
+        registerUser({ name: username, email, password }),
+      ).unwrap();
+      navigate("/");
+      // window.location.reload();
     } catch (err) {
-      setErrorMessage(err.message);
+      setErrorMessage(err);
     }
   };
   if (loading) {
