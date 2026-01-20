@@ -16,7 +16,7 @@ const router = express.Router();
 
 router.use(isAuthenticatedUser);
 
-router.post("/new", createOrder);
+router.post("/new", createOrder); // /api/order/new
 router.get("/me", myOrders);
 router.get("/:id", getSingleOrder);
 
