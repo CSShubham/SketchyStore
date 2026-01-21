@@ -7,7 +7,8 @@ function Header() {
   const [isOpen, setISOpen] = useState(false);
   const navigate = useNavigate();
   const { categories } = useSelector((state) => state.products);
-  const cartQuantity = useSelector((state) => state.cart.totalQuantity);
+  const cartItems = useSelector((state) => state.cart.items);
+  const cartQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const dispatch = useDispatch();
   useEffect(() => {
