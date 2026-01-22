@@ -8,12 +8,21 @@ import orderRoutes from "./routes/orderRoutes.js";
 import wishlistRoutes from "./routes/wishlistRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import cors from "cors";
+import morgan from "morgan";
 dotenv.config();
 connectDB();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL || "*",
+    credentials: true,
+  }));
+
+  // Logger only in development
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
 // Test Route
 app.get("/", (req, res) => {
   res.send("SketchyStore API Running");

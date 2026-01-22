@@ -1,0 +1,17 @@
+# Env
+.env
+
+# Node
+node_modules/
+npm-debug.log*
+
+# OS
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# One-time admin & seeding scripts
+resetAdminPassword.js
+productSeeder.js

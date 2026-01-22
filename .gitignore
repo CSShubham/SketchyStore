@@ -35,3 +35,7 @@ pnpm-debug.log*
 # Misc
 # ----------------------------
 coverage/
+
+# One-time admin & seeding scripts
+resetAdminPassword.js
+productSeeder.js
