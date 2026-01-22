@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 const allowedOrigins = [
   "http://localhost:5173", // Dev frontend
-  "https://your-frontend.vercel.app", // Production frontend (later)
+  "https://sketchystore-frontend.vercel.app", // Production frontend (later)
 ];
 
 app.use(
