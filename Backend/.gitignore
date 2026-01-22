@@ -14,4 +14,4 @@ logs/
 
 # One-time admin & seeding scripts
 resetAdminPassword.js
-productSeeder.js
+/seed/productSeeder.js
