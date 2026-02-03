@@ -6,7 +6,7 @@ import { addToCart } from "../slice/CartSlice";
 import ImageCarousel from "../components/ImageCarousel";
 import Loading from "../components/Loading";
 import API from "../api";
-import { Star, ShoppingCart, Zap, Package, DollarSign, Shield, ArrowLeft, Truck, Tag } from "lucide-react";
+import { Star, ShoppingCart, Zap, Package, DollarSign,IndianRupee, Shield, ArrowLeft, Truck, Tag } from "lucide-react";
 
 function ProductPage() {
   const { productId } = useParams();
@@ -185,12 +185,12 @@ function ProductPage() {
               <p className="text-green-600 font-semibold text-sm">Special Price</p>
               <div className="flex items-baseline gap-3">
                 <span className="text-4xl font-bold text-gray-900">
-                  ${product.discountPrice}
+                  &#8377;{product.discountPrice}
                 </span>
                 {product.price > product.discountPrice && (
                   <>
                     <span className="text-xl text-gray-500 line-through">
-                      ${product.price}
+                      &#8377;{product.price}
                     </span>
                     <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
                       {discountPercentage}% OFF
@@ -247,7 +247,7 @@ function ProductPage() {
                 </span>
               </div>
               <div className="flex flex-col items-center p-4 bg-green-50 rounded-xl text-center">
-                <DollarSign className="text-green-600 mb-2" size={24} />
+                <IndianRupee className="text-green-600 mb-2" size={24} />
                 <span className="text-sm font-medium text-gray-700">
                   Cash on Delivery
                 </span>

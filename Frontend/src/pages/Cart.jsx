@@ -45,7 +45,7 @@ function Cart() {
             </div>
             <div className="border-l pl-6">
               <p className="text-sm text-gray-500">Cart Total</p>
-              <p className="text-2xl font-bold text-[#FF735C]">$100</p>
+              <p className="text-2xl font-bold text-[#FF735C]">&#8377;{cartItems.reduce((sum, item) => sum + (item.product.discountPrice * item.quantity), 0).toFixed(2)}</p>
             </div>
           </div>
           <button className="bg-[#FF735C] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#ff6347] transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
@@ -105,7 +105,7 @@ function Cart() {
 
                     <div className="flex items-baseline gap-2 mb-4">
                       <span className="text-2xl font-bold text-[#FF735C]">
-                        ${item.product.discountPrice}
+                        &#8377;{item.product.discountPrice}
                       </span>
                       <span className="text-sm text-gray-400">per item</span>
                     </div>
@@ -160,7 +160,7 @@ function Cart() {
                           Subtotal
                         </span>
                         <span className="text-xl font-bold text-gray-800">
-                          $
+                          &#8377;
                           {(item.product.discountPrice * item.quantity).toFixed(
                             2,
                           )}
