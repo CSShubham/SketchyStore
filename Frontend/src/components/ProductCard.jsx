@@ -104,14 +104,14 @@ function ProductCard({ product }) {
         <div className="mb-3 md:mb-4">
           <div className="flex items-baseline gap-2 flex-wrap">
             <span className="text-base sm:text-lg md:text-xl font-bold text-[#FF735C]">
-              ${product.discountPrice}
+              &#8377;{product.discountPrice}
             </span>
             <span className="text-xs sm:text-sm text-gray-400 line-through">
-              ${product.price.toFixed(0)}
+              &#8377;{product.price.toFixed(0)}
             </span>
           </div>
           <p className="text-[10px] sm:text-xs text-green-600 font-semibold mt-1">
-            You save ${(product.price - product.discountPrice).toFixed(2)}
+            You save &#8377;{(product.price - product.discountPrice).toFixed(2)}
           </p>
         </div>
 

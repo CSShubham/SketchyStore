@@ -49,7 +49,7 @@ function FrontBelow() {
               <h3 className="text-xl font-semibold text-gray-800 mb-2">
                 Free Shipping*
               </h3>
-              <p className="text-gray-600">Free delivery on orders over $50</p>
+              <p className="text-gray-600">Free delivery on orders over &#8377;999</p>
             </div>
 
             <div className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
