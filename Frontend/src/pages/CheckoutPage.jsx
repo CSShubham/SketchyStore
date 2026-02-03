@@ -335,10 +335,10 @@ function CheckoutPage() {
                   </h3>
                   <div className="flex items-baseline gap-2 mb-2">
                     <span className="text-lg font-bold text-[#FF735C]">
-                      ${displayedProduct.discountPrice}
+                      &#8377;{displayedProduct.discountPrice}
                     </span>
                     <span className="text-sm text-gray-400 line-through">
-                      ${displayedProduct.price}
+                      &#8377;{displayedProduct.price}
                     </span>
                   </div>
 
@@ -390,17 +390,17 @@ function CheckoutPage() {
               <div className="bg-gray-50 p-4 rounded-lg space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-semibold">${subtotal}</span>
+                  <span className="font-semibold">&#8377;{subtotal}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Shipping</span>
-                  <span className="font-semibold">${shipping.toFixed(2)}</span>
+                  <span className="font-semibold">&#8377;{shipping.toFixed(2)}</span>
                 </div>
                 <div className="border-t pt-2 mt-2">
                   <div className="flex justify-between">
                     <span className="font-semibold text-lg">Total</span>
                     <span className="font-bold text-xl text-[#FF735C]">
-                      ${total}
+                      &#8377;{total}
                     </span>
                   </div>
                 </div>

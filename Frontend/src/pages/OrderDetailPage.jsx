@@ -255,7 +255,7 @@ function OrderDetailPage() {
                     <div>
                       <p className="text-sm text-gray-500">Price per unit</p>
                       <p className="text-lg font-bold text-[#FF735C]">
-                        ${item.price}
+                        &#8377;{item.price}
                       </p>
                     </div>
 
@@ -326,14 +326,14 @@ function OrderDetailPage() {
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
                   <span className="font-semibold text-gray-900">
-                    ${order.itemsPrice.toFixed(2)}
+                    &#8377;{order.itemsPrice.toFixed(2)}
                   </span>
                 </div>
 
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
                   <span className="font-semibold text-gray-900">
-                    ${order.shippingPrice.toFixed(2)}
+                    &#8377;{order.shippingPrice.toFixed(2)}
                   </span>
                 </div>
 
@@ -343,7 +343,7 @@ function OrderDetailPage() {
                       Total
                     </span>
                     <span className="text-2xl font-bold text-[#FF735C]">
-                      ${order.totalPrice.toFixed(2)}
+                      &#8377;{order.totalPrice.toFixed(2)}
                     </span>
                   </div>
                 </div>

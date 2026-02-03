@@ -157,7 +157,7 @@ function OrdersPage() {
                           <div className="flex items-center gap-4 text-sm text-gray-600">
                             <span>Qty: {item.quantity}</span>
                             <span className="text-xl font-bold text-[#FF735C]">
-                              ${item.price}
+                              &#8377;{item.price}
                             </span>
                           </div>
                         </div>
@@ -172,20 +172,20 @@ function OrdersPage() {
                           <div className="flex justify-between text-sm text-gray-600">
                             <span>Subtotal</span>
                             <span className="font-medium">
-                              ${order.itemsPrice.toFixed(2)}
+                              &#8377;{order.itemsPrice.toFixed(2)}
                             </span>
                           </div>
                           <div className="flex justify-between text-sm text-gray-600">
                             <span>Shipping</span>
                             <span className="font-medium">
-                              ${order.shippingPrice.toFixed(2)}
+                              &#8377;{order.shippingPrice.toFixed(2)}
                             </span>
                           </div>
                           <div className="border-t border-gray-200 pt-2 mt-2">
                             <div className="flex justify-between items-center">
                               <span className="font-semibold text-gray-900">Total</span>
                               <span className="text-xl font-bold text-[#FF735C]">
-                                ${order.totalPrice.toFixed(2)}
+                                &#8377;{order.totalPrice.toFixed(2)}
                               </span>
                             </div>
                           </div>
